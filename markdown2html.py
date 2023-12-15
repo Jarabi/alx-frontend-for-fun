@@ -5,17 +5,19 @@ Receives two string arguments
 import os
 import sys
 
-def create_headings(line, htmlfile):
+def create_heading(line, htmlfile):
+    """
+    Parses Headings Markdown syntax for generating HTML
+    """
     count = 0
     
     while count < len(line) and line[count] == '#':
         count += 1
     
     if line[count] == ' ':
-        headingtext = line[count + 1:]
+        heading_text = line[count + 1:]
         
-        with open(htmlfile, 'a') as file:
-            file.write(f'<h{count}>{headingtext}</h{count}>\n')
+        htmlfile.write(f'<h{count}>{heading_text}</h{count}>\n')
 
 
 if __name__ == "__main__":
@@ -27,17 +29,33 @@ if __name__ == "__main__":
         print(err, file=sys.stderr)
         exit(1)
 
-    markdownfile = args[0]
-    htmlfile = args[1]
+    markdown_file = args[0]
+    html_file = args[1]
 
-    if not os.path.isfile(markdownfile):
-        print(f"Missing {markdownfile}", file=sys.stderr)
+    if not os.path.isfile(markdown_file):
+        print(f"Missing {markdown_file}", file=sys.stderr)
         exit(1)
 
-    with open(markdownfile) as file:
-        for line in file:
-            # Remove leading/trailing spaces
-            line = line.strip()
+    # Flag to track opening and closing of list items
+    list_started = False
 
-            if line.startswith('#'):
-                create_headings(line, htmlfile)
+    with open(markdown_file) as mdfile:
+        with open(html_file, 'a') as htmlfile:
+
+            for line in mdfile:
+                # Remove leading/trailing spaces
+                line = line.strip()
+
+                if line.startswith('#'):
+                    create_heading(line, htmlfile)
+
+                elif line.startswith('- '):
+                    if not list_started:
+                        htmlfile.write('<ul>\n')
+                        list_started = True
+
+                    ultext = line[2:]
+                    htmlfile.write(f'<li>{ultext}</li>\n')
+
+            if list_started:
+                htmlfile.write('</ul>\n')
