@@ -5,18 +5,19 @@ Receives two string arguments
 import os
 import sys
 
+
 def create_heading(line, htmlfile):
     """
     Parses Headings Markdown syntax for generating HTML
     """
     count = 0
-    
+
     while count < len(line) and line[count] == '#':
         count += 1
-    
+
     if line[count] == ' ':
         heading_text = line[count + 1:]
-        
+
         htmlfile.write(f'<h{count}>{heading_text}</h{count}>\n')
 
 
