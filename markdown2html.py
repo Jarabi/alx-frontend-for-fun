@@ -37,26 +37,33 @@ if __name__ == "__main__":
         print(f"Missing {markdown_file}", file=sys.stderr)
         exit(1)
 
-    # Flag to track opening and closing of list items
-    list_started = False
-
     with open(markdown_file) as mdfile:
         with open(html_file, 'a') as htmlfile:
+            # Flag to track opening and closing of list items
+            list_started = False
+            list_type = ''
 
             for line in mdfile:
                 # Remove leading/trailing spaces
                 line = line.strip()
 
                 if line.startswith('#'):
+                    # If there is an open list, close it first
+                    if list_started:
+                        htmlfile.write(f'</{list_type}>\n')
+                        list_started = False
+
                     create_heading(line, htmlfile)
 
                 elif line.startswith('- '):
+                    list_type = 'ul'
+                    ultext = line[2:]
+
                     if not list_started:
-                        htmlfile.write('<ul>\n')
+                        htmlfile.write(f'<{list_type}>\n')
                         list_started = True
 
-                    ultext = line[2:]
-                    htmlfile.write(f'\t<li>{ultext}</li>\n')
+                    htmlfile.write(f'<li>{ultext}</li>\n')
 
             if list_started:
-                htmlfile.write('</ul>\n')
+                htmlfile.write(f'</{list_type}>\n')
