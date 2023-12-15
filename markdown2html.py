@@ -55,8 +55,12 @@ if __name__ == "__main__":
 
                     create_heading(line, htmlfile)
 
-                elif line.startswith('- '):
-                    list_type = 'ul'
+                elif line.startswith('- ') or line.startswith('* '):
+                    if line.startswith('- '):
+                        list_type = 'ul'
+                    elif line.startswith('* '):
+                        list_type = 'ol'
+
                     ultext = line[2:]
 
                     if not list_started:
