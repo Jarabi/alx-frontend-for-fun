@@ -56,7 +56,7 @@ if __name__ == "__main__":
                         list_started = True
 
                     ultext = line[2:]
-                    htmlfile.write(f'<li>{ultext}</li>\n')
+                    htmlfile.write(f'\t<li>{ultext}</li>\n')
 
             if list_started:
                 htmlfile.write('</ul>\n')
