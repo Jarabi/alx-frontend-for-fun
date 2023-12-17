@@ -9,7 +9,7 @@ import sys
 def create_heading(line, htmlfile):
     """
     Parses Headings Markdown syntax for generating HTML
-    
+
     args:
         line (string): String of text to transform to header
         htmlfile (file descriptor): file descriptor
@@ -26,6 +26,7 @@ def create_heading(line, htmlfile):
 
         htmlfile.write(f'<h{count}>{heading_text}</h{count}>\n')
 
+
 def bold_and_emphasis(line, markdown):
     """
     Transforms text to bold or emphasis based on specified string
@@ -33,15 +34,16 @@ def bold_and_emphasis(line, markdown):
     Args:
         line (string): Text string to convert to bold or emphasis
         markdown (string): Can be '**' for bold or '__' for emphasis
-    
+
     Return: Modified text
     """
     parts = line.split(markdown)
     tag = 'b' if markdown == '**' else 'em'
-    
+
     for index in range(1, len(parts), 2):
         parts[index] = f'<{tag}>{parts[index]}</{tag}>'
-        modified_line = ''.join(parts)
+
+    modified_line = ''.join(parts)
 
     return modified_line
 
@@ -106,7 +108,7 @@ if __name__ == "__main__":
                     if not list_started:
                         htmlfile.write(f'<{list_type}>\n')
                         list_started = True
-                    
+
                     if '**' in ultext:
                         bold_text = bold_and_emphasis(ultext, '**')
                         htmlfile.write(f'<li>{bold_text}</li>\n')
@@ -132,6 +134,7 @@ if __name__ == "__main__":
                             paragraph_started = False
                         else:
                             htmlfile.write('\n<br/>\n')
+
                     line = line.strip()
 
                     if '**' in line:
@@ -142,14 +145,22 @@ if __name__ == "__main__":
                         htmlfile.write(em_text)
                     else:
                         htmlfile.write(line)
-                elif line.startswith('**'):
-                    bold_text = bold_and_emphasis(line, '**')
-                    htmlfile.write(bold_text)
 
-                elif line.startswith('__'):
-                    em_text = bold_and_emphasis(line, '__')
-                    htmlfile.write(em_text)
+                elif line.startswith('**') or line.startswith('__'):
+                    # If there is an open list, close it first
+                    if list_started:
+                        htmlfile.write(f'</{list_type}>\n')
+                        list_started = False
 
+                    # If there is an open paragraph, close it first
+                    if paragraph_started:
+                        htmlfile.write('\n</p>\n')
+                        paragraph_started = False
+
+                    markup = line[:2]
+
+                    modified_text = bold_and_emphasis(line, markup)
+                    htmlfile.write(modified_text)
 
             if list_started:
                 htmlfile.write(f'</{list_type}>\n')
