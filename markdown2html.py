@@ -9,6 +9,10 @@ import sys
 def create_heading(line, htmlfile):
     """
     Parses Headings Markdown syntax for generating HTML
+    
+    args:
+        line (string): String of text to transform to header
+        htmlfile (file descriptor): file descriptor
     """
     # Remove leading/trailing spaces
     line = line.strip()
@@ -21,6 +25,25 @@ def create_heading(line, htmlfile):
         heading_text = line[count + 1:]
 
         htmlfile.write(f'<h{count}>{heading_text}</h{count}>\n')
+
+def bold_and_emphasis(line, markdown):
+    """
+    Transforms text to bold or emphasis based on specified string
+
+    Args:
+        line (string): Text string to convert to bold or emphasis
+        markdown (string): Can be '**' for bold or '__' for emphasis
+    
+    Return: Modified text
+    """
+    parts = line.split(markdown)
+    tag = 'b' if markdown == '**' else 'em'
+    
+    for index in range(1, len(parts), 2):
+        parts[index] = f'<{tag}>{parts[index]}</{tag}>'
+        modified_line = ''.join(parts)
+
+    return modified_line
 
 
 if __name__ == "__main__":
@@ -69,7 +92,7 @@ if __name__ == "__main__":
                     if paragraph_started:
                         htmlfile.write('</p>\n')
                         paragraph_started = False
-                    
+
                     # Remove leading/trailing spaces
                     line = line.strip()
 
@@ -83,8 +106,15 @@ if __name__ == "__main__":
                     if not list_started:
                         htmlfile.write(f'<{list_type}>\n')
                         list_started = True
-
-                    htmlfile.write(f'<li>{ultext}</li>\n')
+                    
+                    if '**' in ultext:
+                        bold_text = bold_and_emphasis(ultext, '**')
+                        htmlfile.write(f'<li>{bold_text}</li>\n')
+                    elif '__' in ultext:
+                        em_text = bold_and_emphasis(ultext, '__')
+                        htmlfile.write(f'<li>{em_text}</li>\n')
+                    else:
+                        htmlfile.write(f'<li>{ultext}</li>\n')
 
                 elif (line and line[0].isalpha()) or line.isspace():
                     # If there is an open list, close it first
@@ -103,7 +133,23 @@ if __name__ == "__main__":
                         else:
                             htmlfile.write('\n<br/>\n')
                     line = line.strip()
-                    htmlfile.write(line)
+
+                    if '**' in line:
+                        bold_text = bold_and_emphasis(line, '**')
+                        htmlfile.write(bold_text)
+                    elif '__' in line:
+                        em_text = bold_and_emphasis(line, '__')
+                        htmlfile.write(em_text)
+                    else:
+                        htmlfile.write(line)
+                elif line.startswith('**'):
+                    bold_text = bold_and_emphasis(line, '**')
+                    htmlfile.write(bold_text)
+
+                elif line.startswith('__'):
+                    em_text = bold_and_emphasis(line, '__')
+                    htmlfile.write(em_text)
+
 
             if list_started:
                 htmlfile.write(f'</{list_type}>\n')
