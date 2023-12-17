@@ -76,6 +76,7 @@ if __name__ == "__main__":
             list_type = ''
 
             for line in mdfile:
+                # Heading section
                 if line.startswith('#'):
                     # If there is an open list, close it first
                     if list_started:
@@ -88,7 +89,8 @@ if __name__ == "__main__":
                         paragraph_started = False
 
                     create_heading(line, htmlfile)
-
+                
+                # Listing section
                 elif line.startswith('- ') or line.startswith('* '):
                     # If there is an open paragraph, close it first
                     if paragraph_started:
@@ -117,8 +119,10 @@ if __name__ == "__main__":
                         htmlfile.write(f'<li>{em_text}</li>\n')
                     else:
                         htmlfile.write(f'<li>{ultext}</li>\n')
-
-                elif (line and line[0].isalpha()) or line.isspace():
+                
+                # Paragraph section
+                elif (line and line[0].isalpha()) or line.isspace()\
+                    or line.startswith('**') or line.startswith('__'):
                     # If there is an open list, close it first
                     if list_started:
                         htmlfile.write(f'</{list_type}>\n')
@@ -146,21 +150,13 @@ if __name__ == "__main__":
                     else:
                         htmlfile.write(line)
 
-                elif line.startswith('**') or line.startswith('__'):
-                    # If there is an open list, close it first
-                    if list_started:
-                        htmlfile.write(f'</{list_type}>\n')
-                        list_started = False
+                # elif line.startswith('**') or line.startswith('__'):
+                    
+                #     line = line.strip()
+                #     markup = line[:2]
 
-                    # If there is an open paragraph, close it first
-                    if paragraph_started:
-                        htmlfile.write('\n</p>\n')
-                        paragraph_started = False
-
-                    markup = line[:2]
-
-                    modified_text = bold_and_emphasis(line, markup)
-                    htmlfile.write(modified_text)
+                #     modified_text = bold_and_emphasis(line, markup)
+                #     htmlfile.write(f'{modified_text}\n')
 
             if list_started:
                 htmlfile.write(f'</{list_type}>\n')
