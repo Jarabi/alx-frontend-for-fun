@@ -2,6 +2,7 @@
 """
 Receives two string arguments
 """
+import hashlib
 import os
 import sys
 
@@ -27,19 +28,67 @@ def bold_emphasis(line, markdown):
     return modified_line
 
 
+def text_to_md5(text):
+    """
+    Converts text within '[[' and ']]' to md5
+
+    Args:
+        text (string): Text to convert
+
+    Return:
+        Converted text
+    """
+    if '[[' in text and ']]' in text:
+        opening = text.find('[[')
+        closing = text.find(']]')
+        to_md5 = text[opening + 2:closing]
+
+        hash_text = hashlib.md5(to_md5.encode()).hexdigest()
+        merged_text = f'{text[:opening]}{hash_text}{text[closing + 2 :]}'
+
+        return merged_text
+    else:
+        return text
+
+
+def remove_c(text):
+    """
+    Removes 'C' and 'c' from text wrapped in '((' and '))'
+
+    Args:
+        text (string): Text to transform
+
+    Return:
+        De-c-sed text
+    """
+    if '((' in text and '))' in text:
+        opening = text.find('((')
+        closing = text.find('))')
+
+        to_replace = text[opening + 2:closing]
+        replaced = to_replace.replace('C', '').replace('c', '')
+        merged_text = f'{text[:opening]}{replaced}{text[closing + 2:]}'
+
+        return merged_text
+    else:
+        return text
+
+
 def process_line(line):
     """
     Processes string based on markdown
 
     Args:
         line (string): Text to process
-    
+
     Return: Processed text
     """
     bold_text = bold_emphasis(line, '**')
     em_text = bold_emphasis(bold_text, '__')
+    hash_text = text_to_md5(em_text)
+    no_c_text = remove_c(hash_text)
 
-    return em_text
+    return no_c_text
 
 
 if __name__ == "__main__":
@@ -90,9 +139,9 @@ if __name__ == "__main__":
 
                     if line[count] == ' ':
                         text = line[count + 1:]
-                        heading_text = process_line(text)
+                        head_text = process_line(text)
 
-                        htmlfile.write(f'<h{count}>{heading_text}</h{count}>\n')
+                        htmlfile.write(f'<h{count}>{head_text}</h{count}>\n')
 
                 # Listing section
                 elif line.startswith('- ') or line.startswith('* '):
@@ -120,7 +169,8 @@ if __name__ == "__main__":
 
                 # Paragraph section
                 elif (line and line[0].isalpha()) or line.isspace()\
-                    or line.startswith('**') or line.startswith('__'):
+                    or line.startswith('**') or line.startswith('__')\
+                    or line.startswith('((') or line.startswith('[['):
                     # If there is an open list, close it first
                     if list_started:
                         htmlfile.write(f'</{list_type}>\n')
