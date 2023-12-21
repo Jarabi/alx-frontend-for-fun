@@ -24,7 +24,14 @@ def create_heading(line, htmlfile):
     if line[count] == ' ':
         heading_text = line[count + 1:]
 
-        htmlfile.write(f'<h{count}>{heading_text}</h{count}>\n')
+        # Check if heading_text contains '**' or '__'
+        if '**' in heading_text or '__' in heading_text:
+            bold_text = bold_emphasis(heading_text, '**')
+            em_text = bold_emphasis(heading_text, '__')
+
+            htmlfile.write(f'<h{count}>{em_text}</h{count}>\n')
+        else:
+            htmlfile.write(f'<h{count}>{heading_text}</h{count}>\n')
 
 
 def bold_emphasis(line, markdown):
@@ -111,11 +118,10 @@ if __name__ == "__main__":
                         htmlfile.write(f'<{list_type}>\n')
                         list_started = True
 
-                    if '**' in ultext:
+                    if '**' in ultext or '__' in ultext:
                         bold_text = bold_emphasis(ultext, '**')
-                        htmlfile.write(f'<li>{bold_text}</li>\n')
-                    elif '__' in ultext:
-                        em_text = bold_emphasis(ultext, '__')
+                        em_text = bold_emphasis(bold_text, '__')
+
                         htmlfile.write(f'<li>{em_text}</li>\n')
                     else:
                         htmlfile.write(f'<li>{ultext}</li>\n')
@@ -141,11 +147,9 @@ if __name__ == "__main__":
 
                     line = line.strip()
 
-                    if '**' in line:
+                    if '**' in line or '__' in line:
                         bold_text = bold_emphasis(line, '**')
-                        htmlfile.write(bold_text)
-                    elif '__' in line:
-                        em_text = bold_emphasis(line, '__')
+                        em_text = bold_emphasis(bold_text, '__')
                         htmlfile.write(em_text)
                     else:
                         htmlfile.write(line)
