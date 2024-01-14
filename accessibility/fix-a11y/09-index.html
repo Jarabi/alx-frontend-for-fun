@@ -7,7 +7,6 @@
     />
     <meta charset="UTF-8" />
     <title>Homepage - A fake website</title>
-    <script src="https://cdn.jsdelivr.net/npm/axe-core@4.2.2"></script>
   </head>
   <body>
     <header class="header">
@@ -238,12 +237,5 @@
         </div>
       </div>
     </footer>
-    <script>
-      // Run Axe accessibility tests
-      axe.run(function (err, results) {
-        if (err) throw err;
-        console.log(results.violations);
-      });
-    </script>
   </body>
 </html>
