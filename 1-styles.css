@@ -1,0 +1,24 @@
+a,
+a:link,
+a:visited {
+    text-decoration: none;
+    color: #831334;
+    position: relative;
+}
+
+a::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    top: 0;
+    bottom: 0;
+    background-image: linear-gradient(90deg, #831334, #831334); /* Underline color */
+    background-size: 0 2px; /*Vertical size of the underline */
+    background-repeat: no-repeat;
+    background-position: left bottom; /* Start position of the underline */
+    transition: background-size .3s ease-in; /* Duration and timing of animation */
+}
+
+a:hover::before {
+    background-size: 100% 2px;
+}
