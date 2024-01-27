@@ -1,0 +1,8 @@
+/* columns and operators */
+@use "sass:math";
+
+@for $i from 1 to 5 {
+	.col-#{$i} {
+		width: math.div(100, $i)%;
+	}
+}
