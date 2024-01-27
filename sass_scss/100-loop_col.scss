@@ -3,6 +3,6 @@
 
 @for $i from 1 to 5 {
 	.col-#{$i} {
-		width: math.div(100, $i) * 1%;
+		width: math.div(100, $i * 1%);
 	}
 }
